@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>example-new-relic-lambda</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Example Java Lambda with New Relic Open Tracing</name>
+    <scm>
+        <connection>scm:git:https://github.com/agarbutt/eample-new-relic-lambda.git</connection>
+        <developerConnection>scm:git:https://github.com/agarbutt/eample-new-relic-lambda.git</developerConnection>
+        <url>https://github.com/agarbutt/eample-new-relic-lambda</url>
+    </scm>
+
+    <properties>
+        <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <aws-lambda-java-core.version>1.2.0</aws-lambda-java-core.version>
+        <aws-lambda-java-events.version>2.2.7</aws-lambda-java-events.version>
+        <log4j-core.version>2.13.0</log4j-core.version>
+        <aws-lambda-java-log4j2.version>1.1.0</aws-lambda-java-log4j2.version>
+        <opentracing.version>0.32.0</opentracing.version>
+        <java-aws-lambda.version>1.0.0</java-aws-lambda.version>
+        <newrelic-java-lambda.version>1.1.1</newrelic-java-lambda.version>
+
+        <!-- Testing Versions -->
+        <junit-jupiter.version>5.5.2</junit-jupiter.version>
+
+        <!-- Plugin Versions -->
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-core</artifactId>
+            <version>${aws-lambda-java-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-events</artifactId>
+            <version>${aws-lambda-java-events.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-log4j2</artifactId>
+            <version>${aws-lambda-java-log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentracing</groupId>
+            <artifactId>opentracing-api</artifactId>
+            <version>${opentracing.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentracing</groupId>
+            <artifactId>opentracing-util</artifactId>
+            <version>${opentracing.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.newrelic.opentracing</groupId>
+            <artifactId>java-aws-lambda</artifactId>
+            <version>${java-aws-lambda.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.googlecode.json-simple</groupId>
+                    <artifactId>json-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.newrelic.opentracing</groupId>
+            <artifactId>newrelic-java-lambda</artifactId>
+            <version>${newrelic-java-lambda.version}</version>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.opentracing</groupId>
+            <artifactId>opentracing-mock</artifactId>
+            <version>${opentracing.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>**/Log4j2Plugins.dat</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>
